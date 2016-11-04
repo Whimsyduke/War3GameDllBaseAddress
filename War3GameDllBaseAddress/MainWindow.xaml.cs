@@ -62,7 +62,7 @@ namespace War3GameDllBaseAddress
                         output += address.ToString("{0:X8}");
                     }
                     sr.Close();
-                    if (!File.Exists(TextBox_Output.Text))
+                    if (File.Exists(TextBox_Output.Text))
                     {
                         if (MessageBox.Show("是否删除已经存在的" + TextBox_Output.Text + "文件", "确认删除", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                         {
@@ -79,7 +79,7 @@ namespace War3GameDllBaseAddress
                 }
                 else
                 {
-                    if (!File.Exists(TextBox_Output.Text))
+                    if (File.Exists(TextBox_Output.Text))
                     {
                         if (MessageBox.Show("是否删除已经存在的" + TextBox_Output.Text + "文件", "确认删除", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                         {
