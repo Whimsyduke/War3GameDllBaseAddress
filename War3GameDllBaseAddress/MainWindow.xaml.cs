@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,12 +25,32 @@ namespace War3GameDllBaseAddress
         public MainWindow()
         {
             InitializeComponent();
+
         }
+        private string GameAddressReplace(Match func)
+        {
+            string str = func.ToString().Substring(TextBox_Name.Text.Length + 1);
+            int address = Int32.Parse(str, System.Globalization.NumberStyles.HexNumber) - baseAddress;
+            StringBuilder sb = new StringBuilder();
+            sb.Append(TextBox_Name.Text + ".");
+            sb.AppendFormat("{0:X8}", address);
+            return sb.ToString();
+        }
+
+        private int baseAddress = 0;
+        private Regex addressRegex = new Regex("[0123456789ABCDEF]{8}");
 
         private void Button_Gen_Click(object sender, RoutedEventArgs e)
         {
-            try
+            //try
             {
+                Regex regex = null;
+                bool isModifyFunc = false;
+                if (!string.IsNullOrEmpty(TextBox_Name.Text))
+                {
+                    regex = new Regex(TextBox_Name.Text + ".[0123456789ABCDEF]{8}");
+                    isModifyFunc = true;
+                }
                 FileInfo file;
                 if (File.Exists(TextBox_Path.Text))
                 {
@@ -40,26 +61,43 @@ namespace War3GameDllBaseAddress
                     MessageBox.Show("文件地址：" + TextBox_Path.Text + "无效");
                     return;
                 }
+                baseAddress = 0;
                 if (TextBox_Path.Text == TextBox_Output.Text)
                 {
                     StreamReader sr = new StreamReader(file.FullName);
                     string output = "";
-                    int baseAddress = 0;
                     while (!sr.EndOfStream)
                     {
                         string line = sr.ReadLine();
-                        int address = Int32.Parse(line.Substring(0, 8), System.Globalization.NumberStyles.HexNumber);
-                        line = line.Substring(8);
-                        if (baseAddress == 0)
+                        if (line.Length < 8)
                         {
-                            baseAddress = address - 0x1000;
-                            address = 0x1000;
+                            output += line;
+                            continue;
+                        }
+                        string addressStr = line.Substring(0, 8);
+                        if (addressRegex.IsMatch(addressStr))
+                        {
+                            int address = Int32.Parse(addressStr, System.Globalization.NumberStyles.HexNumber);
+                            line = line.Substring(8);
+                            if (baseAddress == 0)
+                            {
+                                baseAddress = address - 0x1000;
+                                address = 0x1000;
+                            }
+                            else
+                            {
+                                address = address - baseAddress;
+                            }
+                            if (isModifyFunc)
+                            {
+                                line = regex.Replace(line, new MatchEvaluator(GameAddressReplace));
+                            }
+                            output += address.ToString("{0:X8}") + line;
                         }
                         else
                         {
-                            address = address - baseAddress;
+                            output += line;
                         }
-                        output += address.ToString("{0:X8}");
                     }
                     sr.Close();
                     if (File.Exists(TextBox_Output.Text))
@@ -92,7 +130,6 @@ namespace War3GameDllBaseAddress
                     }
                     StreamReader sr = new StreamReader(file.FullName);
                     StreamWriter sw = new StreamWriter(TextBox_Output.Text);
-                    int baseAddress = 0;
                     while (!sr.EndOfStream)
                     {
                         string line = sr.ReadLine();
@@ -101,30 +138,42 @@ namespace War3GameDllBaseAddress
                             sw.WriteLine(line);
                             continue;
                         }
-                        int address = Int32.Parse(line.Substring(0, 8), System.Globalization.NumberStyles.HexNumber);
-                        line = line.Substring(8);
-                        if (baseAddress == 0)
+                        string addressStr = line.Substring(0, 8);
+                        if (addressRegex.IsMatch(addressStr))
                         {
-                            baseAddress = address - 0x1000;
-                            address = 0x1000;
+                            int address = Int32.Parse(line.Substring(0, 8), System.Globalization.NumberStyles.HexNumber);
+                            line = line.Substring(8);
+                            if (baseAddress == 0)
+                            {
+                                baseAddress = address - 0x1000;
+                                address = 0x1000;
+                            }
+                            else
+                            {
+                                address = address - baseAddress;
+                            }
+                            StringBuilder sb = new StringBuilder();
+                            sb.AppendFormat("{0:X8}", address);
+                            if (isModifyFunc)
+                            {
+                                line = regex.Replace(line, new MatchEvaluator(GameAddressReplace));
+                            }
+                            sw.WriteLine(sb.ToString() + line);
                         }
                         else
                         {
-                            address = address - baseAddress;
+                            sw.WriteLine(line);
                         }
-                        StringBuilder sb = new StringBuilder();
-                        sb.AppendFormat("{0:X8}", address);
-                        sw.WriteLine(sb.ToString() + line);
                     }
                     sr.Close();
                     sw.Close();
                 }
             }
-            catch (Exception error)
-            {
-                MessageBox.Show(error.Message);
-                return;
-            }
+            //catch (Exception error)
+            //{
+            //    MessageBox.Show(error.Message);
+            //    return;
+            //}
             MessageBox.Show("生成完成！");
         }
 
