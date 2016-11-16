@@ -42,7 +42,7 @@ namespace War3GameDllBaseAddress
 
         private void Button_Gen_Click(object sender, RoutedEventArgs e)
         {
-            //try
+            try
             {
                 Regex regex = null;
                 bool isModifyFunc = false;
@@ -69,6 +69,7 @@ namespace War3GameDllBaseAddress
                     while (!sr.EndOfStream)
                     {
                         string line = sr.ReadLine();
+                        if (CheckBox_DeleteNotDllText.IsChecked == true && !line.Contains(TextBox_Name.Text)) continue;
                         if (line.Length < 8)
                         {
                             output += line;
@@ -81,8 +82,16 @@ namespace War3GameDllBaseAddress
                             line = line.Substring(8);
                             if (baseAddress == 0)
                             {
-                                baseAddress = address - 0x1000;
-                                address = 0x1000;
+                                if (CheckBox_UseSepcialBaseAddress.IsChecked == true)
+                                {
+                                    baseAddress = Int32.Parse(TextBox_BaseAddress.Text, System.Globalization.NumberStyles.HexNumber) << 16;
+                                    address = address - baseAddress;
+                                }
+                                else
+                                {
+                                    baseAddress = address - 0x1000;
+                                    address = 0x1000;
+                                }
                             }
                             else
                             {
@@ -133,6 +142,7 @@ namespace War3GameDllBaseAddress
                     while (!sr.EndOfStream)
                     {
                         string line = sr.ReadLine();
+                        if (CheckBox_DeleteNotDllText.IsChecked == true && !line.Contains(TextBox_Name.Text)) continue;
                         if (line.Length < 8)
                         {
                             sw.WriteLine(line);
@@ -145,8 +155,16 @@ namespace War3GameDllBaseAddress
                             line = line.Substring(8);
                             if (baseAddress == 0)
                             {
-                                baseAddress = address - 0x1000;
-                                address = 0x1000;
+                                if (CheckBox_UseSepcialBaseAddress.IsChecked == true)
+                                {
+                                    baseAddress = Int32.Parse(TextBox_BaseAddress.Text, System.Globalization.NumberStyles.HexNumber) << 16;
+                                    address = address - baseAddress;
+                                }
+                                else
+                                {
+                                    baseAddress = address - 0x1000;
+                                    address = 0x1000;
+                                }
                             }
                             else
                             {
@@ -169,11 +187,11 @@ namespace War3GameDllBaseAddress
                     sw.Close();
                 }
             }
-            //catch (Exception error)
-            //{
-            //    MessageBox.Show(error.Message);
-            //    return;
-            //}
+            catch (Exception error)
+            {
+                MessageBox.Show(error.Message);
+                return;
+            }
             MessageBox.Show("生成完成！");
         }
 
