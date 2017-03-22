@@ -4,8 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:War3GameDllBaseAddress"
-        mc:Ignorable="d"
-        Title="GameDll" Height="130" Width="525" ResizeMode="NoResize">
+        mc:Ignorable="d" 
+        Title="GameDll" Height="170" Width="525" ResizeMode="NoResize">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
@@ -16,29 +16,43 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Label Content="汇编文本：" Grid.Column="0" Grid.Row="0" Margin="3" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-        <TextBox Name="TextBox_Path" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="0" Margin="3" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+        <TextBox Name="TextBox_Path" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="0" Margin="3" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="TextBox_Path_TextChanged"/>
         <Button Name="Button_Path" Grid.Column="2" Grid.Row="0" Content="路径" Margin="3" Click="Button_Path_Click"/>
         <Label Content="输出文本：" Grid.Column="0" Grid.Row="1" Margin="3" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-        <TextBox Name="TextBox_Output" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1" Margin="3" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+        <TextBox Name="TextBox_Output" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1" Margin="3" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" TextChanged="TextBox_Output_TextChanged"/>
         <Button Name="Button_Output" Grid.Column="2" Grid.Row="1" Content="路径" Margin="3" Click="Button_Output_Click"/>
         <Label Content="Dll名称：" Grid.Column="0" Grid.Row="2" Margin="3" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
         <Grid Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="60"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBox Name="TextBox_Name" Text="game" Grid.Column="0" Margin="3" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
             <CheckBox Name="CheckBox_UseSepcialBaseAddress" Grid.Column="1" IsChecked="False" Margin="3" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <Label Content="基地址：" Grid.Column="2" Margin="3" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-            <TextBox Name="TextBox_BaseAddress" Grid.Column="3" Margin="3" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" MaxLength="4" IsEnabled="{Binding ElementName=CheckBox_UseSepcialBaseAddress,Path=IsChecked}"/>
+            <TextBox Name="TextBox_BaseAddress" Grid.Column="3" Margin="3" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" MaxLength="4" IsEnabled="{Binding ElementName=CheckBox_UseSepcialBaseAddress,Path=IsChecked}" ToolTip="只有前四位"/>
             <CheckBox Name="CheckBox_DeleteNotDllText" Content="删除Dll无关行" Grid.Column="4" IsChecked="False" Margin="3" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <Button Name="Button_Gen" Grid.Column="5" Content="确定" Margin="3" Click="Button_Gen_Click"/>
+        </Grid>
+        <Label Content="其它处理：" Grid.Column="0" Grid.Row="3" Margin="3" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+        <Grid Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="80"/>
+            </Grid.ColumnDefinitions>
+            <CheckBox Name="CheckBox_RemoveAddresAndNotes" Grid.Column="0" IsChecked="False" Margin="3" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Label Content="删除地址及注释信息。" Grid.Column="1" Margin="3" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+            <Label Content="地址覆盖内容：" Grid.Column="2" Margin="3" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+            <TextBox Name="TextBox_MaskText" Grid.Column="3" Margin="3" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" MaxLength="4" Text="XXXXXXXX"/>
+            <Button Name="Button_Gen" Grid.Column="4" Content="确定" Margin="3" Click="Button_Gen_Click" IsEnabled="False"/>
         </Grid>
     </Grid>
 </Window>

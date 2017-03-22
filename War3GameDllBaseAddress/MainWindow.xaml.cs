@@ -22,6 +22,38 @@ namespace War3GameDllBaseAddress
     /// </summary>
     public partial class MainWindow : Window
     {
+        private bool fileExistInput = false;
+
+        private bool fileExistOutput = false;
+        public bool FileExistInput
+        {
+            get
+            {
+                return fileExistInput;
+            }
+
+            set
+            {
+                fileExistInput = value;
+                Button_Gen.IsEnabled = fileExistInput && fileExistOutput;
+            }
+        }
+
+        public bool FileExistOutput
+        {
+            get
+            {
+                return fileExistOutput;
+            }
+
+            set
+            {
+                fileExistOutput = value;
+                Button_Gen.IsEnabled = fileExistInput && fileExistOutput;
+            }
+        }
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -36,7 +68,10 @@ namespace War3GameDllBaseAddress
             sb.AppendFormat("{0:X8}", address);
             return sb.ToString();
         }
-
+        private string GameAddressMask(Match func)
+        {
+            return TextBox_MaskText.Text;
+        }
         private int baseAddress = 0;
         private Regex addressRegex = new Regex("[0123456789ABCDEF]{8}");
 
@@ -64,65 +99,7 @@ namespace War3GameDllBaseAddress
                 baseAddress = 0;
                 if (TextBox_Path.Text == TextBox_Output.Text)
                 {
-                    StreamReader sr = new StreamReader(file.FullName);
-                    string output = "";
-                    while (!sr.EndOfStream)
-                    {
-                        string line = sr.ReadLine();
-                        if (CheckBox_DeleteNotDllText.IsChecked == true && !line.Contains(TextBox_Name.Text)) continue;
-                        if (line.Length < 8)
-                        {
-                            output += line;
-                            continue;
-                        }
-                        string addressStr = line.Substring(0, 8);
-                        if (addressRegex.IsMatch(addressStr))
-                        {
-                            int address = Int32.Parse(addressStr, System.Globalization.NumberStyles.HexNumber);
-                            line = line.Substring(8);
-                            if (baseAddress == 0)
-                            {
-                                if (CheckBox_UseSepcialBaseAddress.IsChecked == true)
-                                {
-                                    baseAddress = Int32.Parse(TextBox_BaseAddress.Text, System.Globalization.NumberStyles.HexNumber) << 16;
-                                    address = address - baseAddress;
-                                }
-                                else
-                                {
-                                    baseAddress = address - 0x1000;
-                                    address = 0x1000;
-                                }
-                            }
-                            else
-                            {
-                                address = address - baseAddress;
-                            }
-                            if (isModifyFunc)
-                            {
-                                line = regex.Replace(line, new MatchEvaluator(GameAddressReplace));
-                            }
-                            output += address.ToString("{0:X8}") + line;
-                        }
-                        else
-                        {
-                            output += line;
-                        }
-                    }
-                    sr.Close();
-                    if (File.Exists(TextBox_Output.Text))
-                    {
-                        if (MessageBox.Show("是否删除已经存在的" + TextBox_Output.Text + "文件", "确认删除", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                        {
-                            File.Delete(TextBox_Output.Text);
-                        }
-                        else
-                        {
-                            return;
-                        }
-                    }
-                    StreamWriter sw = new StreamWriter(TextBox_Output.Text);
-                    sw.Write(output);
-                    sw.Close();
+                    MessageBox.Show("输入输出路径不能相同!");
                 }
                 else
                 {
@@ -148,39 +125,52 @@ namespace War3GameDllBaseAddress
                             sw.WriteLine(line);
                             continue;
                         }
-                        string addressStr = line.Substring(0, 8);
-                        if (addressRegex.IsMatch(addressStr))
+                        if (CheckBox_RemoveAddresAndNotes.IsChecked == true)
                         {
-                            int address = Int32.Parse(line.Substring(0, 8), System.Globalization.NumberStyles.HexNumber);
-                            line = line.Substring(8);
-                            if (baseAddress == 0)
+                            if (line.Length > 28)
                             {
-                                if (CheckBox_UseSepcialBaseAddress.IsChecked == true)
-                                {
-                                    baseAddress = Int32.Parse(TextBox_BaseAddress.Text, System.Globalization.NumberStyles.HexNumber) << 16;
-                                    address = address - baseAddress;
-                                }
-                                else
-                                {
-                                    baseAddress = address - 0x1000;
-                                    address = 0x1000;
-                                }
+                                line = line.Substring(0, 11) + "                " + line.Substring(28);
                             }
-                            else
-                            {
-                                address = address - baseAddress;
-                            }
-                            StringBuilder sb = new StringBuilder();
-                            sb.AppendFormat("{0:X8}", address);
-                            if (isModifyFunc)
-                            {
-                                line = regex.Replace(line, new MatchEvaluator(GameAddressReplace));
-                            }
-                            sw.WriteLine(sb.ToString() + line);
+                            line = addressRegex.Replace(line, new MatchEvaluator(GameAddressMask));
+                            if (line.Contains(';')) line = line.Substring(0, line.IndexOf(';'));
+                            sw.WriteLine(line);
                         }
                         else
                         {
-                            sw.WriteLine(line);
+                            string addressStr = line.Substring(0, 8);
+                            if (addressRegex.IsMatch(addressStr))
+                            {
+                                int address = Int32.Parse(line.Substring(0, 8), System.Globalization.NumberStyles.HexNumber);
+                                line = line.Substring(8);
+                                if (baseAddress == 0)
+                                {
+                                    if (CheckBox_UseSepcialBaseAddress.IsChecked == true)
+                                    {
+                                        baseAddress = Int32.Parse(TextBox_BaseAddress.Text, System.Globalization.NumberStyles.HexNumber) << 16;
+                                        address = address - baseAddress;
+                                    }
+                                    else
+                                    {
+                                        baseAddress = address - 0x1000;
+                                        address = 0x1000;
+                                    }
+                                }
+                                else
+                                {
+                                    address = address - baseAddress;
+                                }
+                                StringBuilder sb = new StringBuilder();
+                                sb.AppendFormat("{0:X8}", address);
+                                if (isModifyFunc)
+                                {
+                                    line = regex.Replace(line, new MatchEvaluator(GameAddressReplace));
+                                }
+                                sw.WriteLine(sb.ToString() + line);
+                            }
+                            else
+                            {
+                                sw.WriteLine(line);
+                            }
                         }
                     }
                     sr.Close();
@@ -252,6 +242,16 @@ namespace War3GameDllBaseAddress
             {
                 TextBox_Output.Text = "";
             }
+        }
+
+        private void TextBox_Output_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            FileExistOutput = TextBox_Path.Text != TextBox_Output.Text;
+        }
+
+        private void TextBox_Path_TextChanged(object sender, TextChangedEventArgs e)
+        {
+           FileExistInput = File.Exists(TextBox_Path.Text);
         }
     }
 }
