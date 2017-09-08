@@ -43,16 +43,14 @@
         <Grid Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="80"/>
             </Grid.ColumnDefinitions>
-            <CheckBox Name="CheckBox_RemoveAddresAndNotes" Grid.Column="0" IsChecked="False" Margin="3" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <Label Content="删除地址及注释信息。" Grid.Column="1" Margin="3" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-            <Label Content="地址覆盖内容：" Grid.Column="2" Margin="3" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-            <TextBox Name="TextBox_MaskText" Grid.Column="3" Margin="3" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" MaxLength="4" Text="XXXXXXXX"/>
-            <Button Name="Button_Gen" Grid.Column="4" Content="确定" Margin="3" Click="Button_Gen_Click" IsEnabled="False"/>
+            <CheckBox Name="CheckBox_RemoveAddresAndNotes" Grid.Column="0" IsChecked="False" Margin="3" HorizontalAlignment="Left" VerticalAlignment="Center" Content="覆盖地址及注释"/>
+            <TextBox Name="TextBox_MaskText" Grid.Column="1" Margin="3" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" MaxLength="4" Text="XXXXXXXX" IsEnabled="{Binding ElementName=CheckBox_RemoveAddresAndNotes, Path=IsChecked}"/>
+            <CheckBox Name="CheckBox_ModifyLineNumber" Grid.Column="2" IsChecked="True" Margin="3" HorizontalAlignment="Left" VerticalAlignment="Center" Content="修改行号"/>
+            <Button Name="Button_Gen" Grid.Column="3" Content="确定" Margin="3" Click="Button_Gen_Click" IsEnabled="False"/>
         </Grid>
     </Grid>
 </Window>

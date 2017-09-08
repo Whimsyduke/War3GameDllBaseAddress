@@ -138,10 +138,13 @@ namespace War3GameDllBaseAddress
                         else
                         {
                             string addressStr = line.Substring(0, 8);
-                            if (addressRegex.IsMatch(addressStr))
+                            if (isModifyFunc)
+                            {
+                                line = regex.Replace(line, new MatchEvaluator(GameAddressReplace));
+                            }
+                            if (CheckBox_ModifyLineNumber.IsChecked == true && addressRegex.IsMatch(addressStr))
                             {
                                 int address = Int32.Parse(line.Substring(0, 8), System.Globalization.NumberStyles.HexNumber);
-                                line = line.Substring(8);
                                 if (baseAddress == 0)
                                 {
                                     if (CheckBox_UseSepcialBaseAddress.IsChecked == true)
@@ -161,10 +164,7 @@ namespace War3GameDllBaseAddress
                                 }
                                 StringBuilder sb = new StringBuilder();
                                 sb.AppendFormat("{0:X8}", address);
-                                if (isModifyFunc)
-                                {
-                                    line = regex.Replace(line, new MatchEvaluator(GameAddressReplace));
-                                }
+                                line = line.Substring(8);
                                 sw.WriteLine(sb.ToString() + line);
                             }
                             else
@@ -194,7 +194,7 @@ namespace War3GameDllBaseAddress
             }
             else
             {
-                fileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                fileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             }
             fileDialog.Filter = "文本文件|*.txt";
             fileDialog.Multiselect = false;
@@ -229,7 +229,7 @@ namespace War3GameDllBaseAddress
             }
             else
             {
-                fileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                fileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             }
             fileDialog.Filter = "文本文件|*.txt";
             fileDialog.RestoreDirectory = true;
